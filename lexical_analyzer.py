@@ -1,5 +1,5 @@
+from pprint import pprint
 import re
-
 
 class lexical_analyzer:
 
@@ -15,7 +15,9 @@ class lexical_analyzer:
             ('DIFER', r'<>'),
             ('OR', r'\b[oO][rR]\b'),
             ('AND', r'\b[aA][nN][dD]\b'),
-            # Palavras-chave
+            ('COMMENT', r'\/\/[^\n]*'),
+            ('STRING', r'\".*?\"'),
+            # Palavras-reservadas
             ('PROGRAM', r'\b[pP][rR][oO][gG][rR][aA][mM]\b'),
             ('INTEGER', r'\b[iI][nN][tT]\b'),
             ('BOOLEAN', r'\b[bB][oO][oO][lL]\b'),
@@ -45,7 +47,6 @@ class lexical_analyzer:
             ('ABPAR', r'\('),
             ('FPAR', r'\)'),
             # Comentários e espaços em branco
-            ('COMMENT', r'\/\/[^\n]*'),
             ('NEWLINE', r'\n'),
             ('SKIP', r'[ \t]+'),
             # Qualquer caractere não reconhecido
@@ -56,16 +57,18 @@ class lexical_analyzer:
         print(tokens_join, '\n\n\n')
         lin_start = 0
 
-        # Lists of output for the program
         token = []
         lexeme = []
         row = []
         column = []
 
-        # It analyzes the code to find the lexemes and their respective Tokens
         for m in re.finditer(tokens_join, code):
             token_type = m.lastgroup
+            print(token_type)
+            
             token_lexeme = m.group(token_type)
+            print(token_lexeme)
+
             if token_type == 'NEWLINE':
                 lin_start = m.end()
                 self.lin_num += 1
@@ -75,8 +78,7 @@ class lexical_analyzer:
                 continue
             elif token_type == 'MISMATCH':
                 print(1)
-                print(f"token_lexeme: {
-                      token_lexeme}, token_type: {token_type}")
+                print(f"token_lexeme: {token_lexeme}, token_type: {token_type}")
                 raise RuntimeError('%r unexpected on line %d' %
                                    (token_lexeme, self.lin_num))
             else:
@@ -85,27 +87,33 @@ class lexical_analyzer:
                 token.append(token_type)
                 lexeme.append(token_lexeme)
                 row.append(self.lin_num)
-                # To print information about a Token
+
                 print('Token = {0}, Lexeme = \'{1}\', Row = {2}, Column = {3}'
                       .format(token_type, token_lexeme, self.lin_num, col))
 
-        return token, lexeme, row, column
+        all_tokens = []
+        for i in range(len(token)):
+            all_tokens.append({
+                "type": token[i],
+                "lexeme": lexeme[i],
+                "line": row[i], 
+                "column": column[i]
+            })
 
+        return all_tokens
 
 if (__name__ == "__main__"):
     codigo_funciona = """
     program;
+    //opa tudo bem
     var: int;
     begin
         := 10;
-        write(a);
-        fasfasfafafs
+        write("Hello World");
     end
     """
 
     lex = lexical_analyzer()
-    tokens, lexemas, linhas, colunas = lex.tokens(codigo_funciona)
-    print("Tokens:", tokens)
-    print("Lexemas:", lexemas)
-    print("Linhas:", linhas)
-    print("Colunas:", colunas)
+    teste = lex.tokens(codigo_funciona)
+    pprint(teste)
+    
