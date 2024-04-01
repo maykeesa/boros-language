@@ -9,12 +9,8 @@ class lexical_analyzer:
         rules = [
             # Regras para tokens compostos e específicos
             ('ATRIB', r':='),
-            ('MAIG', r'>='),
-            ('MENIG', r'<='),
-            ('IGUAL', r'=='),
-            ('DIFER', r'<>'),
-            ('OR', r'\b[oO][rR]\b'),
-            ('AND', r'\b[aA][nN][dD]\b'),
+            ('OPREL', r'>=|<=|==|<>|>|<'),
+            ('OPLOG', r'\b[oO][rR]\b|\b[aA][nN][dD]\b'),
             ('COMMENT', r'\/\/[^\n]*'),
             ('STRING', r'\".*?\"'),
             # Palavras-reservadas
@@ -32,11 +28,9 @@ class lexical_analyzer:
             ('WRITE', r'\b[wW][rR][iI][tT][eE]\b'),
             # Tokens numéricos e operadores
             ('NUMBER', r'\b[+-]?\d+\b'),
-            ('MAIS', r'\+'),
-            ('MENOS', r'-'),
-            ('VEZES', r'\*'),
-            ('DIVIDIR', r'\/'),
-            ('NEG', r'\~'),
+            ('OPAD', r'\+|-'),
+            ('OPMULT', r'\*|\/'),
+            ('OPNEG', r'\~'),
             ('MAIOR', r'>'),
             ('MENOR', r'<'),
             # Símbolos diversos
