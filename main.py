@@ -50,7 +50,6 @@ class lexical_analyzer:
         ]
 
         tokens_join = '|'.join('(?P<%s>%s)' % x for x in rules)
-        print(tokens_join, '\n\n\n')
         lin_start = 0
 
         token = []
@@ -60,10 +59,8 @@ class lexical_analyzer:
 
         for m in re.finditer(tokens_join, code):
             token_type = m.lastgroup
-            print(token_type)
             
             token_lexeme = m.group(token_type)
-            print(token_lexeme)
 
             if token_type == 'NEWLINE':
                 lin_start = m.end()
@@ -73,8 +70,6 @@ class lexical_analyzer:
             elif token_type == 'COMMENT':
                 continue
             elif token_type == 'MISMATCH':
-                print(1)
-                print(f"token_lexeme: {token_lexeme}, token_type: {token_type}")
                 raise RuntimeError('%r unexpected on line %d' %
                                    (token_lexeme, self.lin_num))
             else:
@@ -83,9 +78,6 @@ class lexical_analyzer:
                 token.append(token_type)
                 lexeme.append(token_lexeme)
                 row.append(self.lin_num)
-
-                print('Token = {0}, Lexeme = \'{1}\', Row = {2}, Column = {3}'
-                      .format(token_type, token_lexeme, self.lin_num, col))
 
         all_tokens = []
         for i in range(len(token)):
@@ -147,7 +139,7 @@ class syntax_analyzer:
         if self.current_token['type'] == 'IDENTIFIER':
             self.match('IDENTIFIER')
             self.match('ATRIB')
-            self.expression()
+            self.expressions()
             self.match('PVIG')
         elif self.current_token['type'] == 'WRITE':
             self.match('WRITE')
@@ -157,6 +149,12 @@ class syntax_analyzer:
             self.match('PVIG')
         else:
             raise RuntimeError('Unexpected token: ' + self.current_token['type'])
+        
+    def expressions(self):
+        self.expression()
+        while self.current_token['type'] == 'OPAD' or self.current_token['type'] == 'OPMULT' or self.current_token['type'] == 'OPREL' or self.current_token['type'] == 'OPLOG':
+            self.match(self.current_token['type'])
+            self.expression()
 
     def expression(self):
         if self.current_token['type'] == 'NUMBER' or self.current_token['type'] == 'IDENTIFIER':
@@ -184,7 +182,7 @@ if __name__ == "__main__":
     end.
     """
     tokens = lex.tokens(codigo_funciona)
-    print(tokens)
+    print("\nLexical analysis successful.")
     syntax.parse(tokens)
     print("Syntax analysis successful.")
 
